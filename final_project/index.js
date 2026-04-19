@@ -1,22 +1,47 @@
 const express = require('express');
-const jwt = require('jsonwebtoken');
-const session = require('express-session')
-const customer_routes = require('./router/auth_users.js').authenticated;
-const genl_routes = require('./router/general.js').general;
+const axios = require('axios');
+let router = express.Router();
 
-const app = express();
+const BASE_URL = "http://localhost:5000";
 
-app.use(express.json());
-
-app.use("/customer",session({secret:"fingerprint_customer",resave: true, saveUninitialized: true}))
-
-app.use("/customer/auth/*", function auth(req,res,next){
-//Write the authenication mechanism here
+// ✅ Get all books
+router.get('/async/books', async (req, res) => {
+  try {
+    const response = await axios.get(`${BASE_URL}/`);
+    res.json(response.data);
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching books" });
+  }
 });
- 
-const PORT =5000;
 
-app.use("/customer", customer_routes);
-app.use("/", genl_routes);
+// ✅ Get book by ISBN
+router.get('/async/books/isbn/:isbn', async (req, res) => {
+  try {
+    const response = await axios.get(`${BASE_URL}/isbn/${req.params.isbn}`);
+    res.json(response.data);
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching book by ISBN" });
+  }
+});
 
-app.listen(PORT,()=>console.log("Server is running"));
+// ✅ Get books by Author
+router.get('/async/books/author/:author', async (req, res) => {
+  try {
+    const response = await axios.get(`${BASE_URL}/author/${req.params.author}`);
+    res.json(response.data);
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching books by author" });
+  }
+});
+
+// ✅ Get books by Title
+router.get('/async/books/title/:title', async (req, res) => {
+  try {
+    const response = await axios.get(`${BASE_URL}/title/${req.params.title}`);
+    res.json(response.data);
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching books by title" });
+  }
+});
+
+module.exports = router;
